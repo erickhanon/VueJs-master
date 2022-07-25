@@ -1,75 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <!-- this is just to practice my vueJs skills, nothing fancy please ignore -->
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <!-- this is just to practice my vueJs skills, nothing fancy please ignore -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VueJs</title>
     <style>
-        .box { 
-            background-color: black;
-            height: 20px;
-            width: 20px;
-        }
+      .box {
+        background-color: black;
+        height: 20px;
+        width: 20px;
+      }
 
-        input{
-          margin: 10px;
-          display: block;
-        }
+      input {
+        margin: 10px;
+        display: block;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <script src="https://unpkg.com/vue@3"></script>
 
     <div id="app">
-      {{ greeting }}
-      <hr />
-      <input @keyup.enter="greet(greeting + '!!!!!!')" v-model="greeting" />
-      <button @click="toggleBox">Toggle</button>
-      <div v-if="isVisible" class="box"></div>
       <login-form />
     </div>
     <script>
       let app = Vue.createApp({
         data() {
           return {
-            greeting: 'Hello Vue!',
-            isVisible: true
-          }
+            greeting: "Hello Vue!",
+            isVisible: true,
+          };
         },
         methods: {
-            toggleBox() {
-                this.isVisible = !this.isVisible
-            },
-            greet(greeting) { 
-                alert(greeting)
-            }
-        }
-      })
+          toggleBox() {
+            this.isVisible = !this.isVisible;
+          },
+          greet(greeting) {
+            alert(greeting);
+          },
+        },
+      });
 
-      app.component('login-form',{
+      app.component("login-form", {
         template: `
           <form @submit.prevent="handleSubmit">
             <h1>{{ title }}</h1>
-            <input type='email' />
-            <input type='password' />
+            <custom-input
+            v-for="(input,i) in inputs"
+            v-model="input.value" 
+            :key="i"
+            :label="input.label"
+            :type="input.type" />
             <button>login</button>
           </form>
         `,
+        components: ["custom-input"],
         data() {
           return {
-            title: 'Login Form'
-          }
+            title: "Login Form",
+            inputs: [
+              {
+                label: "Email",
+                value: "",
+                type: "email",
+              },
+              {
+                label: "Password",
+                value: "",
+                type: "password",
+              },
+            ],
+          };
         },
         methods: {
-          handleSubmit(){
-            alert("submitted")
-          }
-        }
-      })
+          handleSubmit() {
+            alert("submitted");
+          },
+        },
+      });
 
-      app.mount('#app')
+      app.component("custom-input", {
+        template: `
+          <label>
+            {{ label }}
+            <input :type="type" v-model="inputValue"/>
+            </label>
+        `,
+        props: ["label", "type", "modelValue"],
+        computed: {
+          inputValue: {
+            get() {
+              return this.modelValue;
+            },
+            set(value) {
+              this.$emit("update:modelValue", value);
+            },
+          },
+        },
+        // data() {
+        //   return {
+        //     inputValue: "",
+        //   };
+        // },
+      });
+      app.mount("#app");
     </script>
-</body>
+  </body>
 </html>
